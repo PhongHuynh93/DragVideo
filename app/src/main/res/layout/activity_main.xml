@@ -13,20 +13,91 @@
         android:layout_height="match_parent"/>
 
     <!--fixme replace with fragment-->
-    <com.example.cpu11112_local.testdragvideo.DragVideoView
+    <com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView
         android:id="@+id/dragVideo"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.example.cpu11112_local.testdragvideo.test.MvImageView
-            android:id="@+id/videoView"
-            android:background="@color/colorAccent"
+        <LinearLayout
+            android:id="@+id/videoWrapper"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!--video player-->
+            <com.example.cpu11112_local.testdragvideo.test.MvImageView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent"/>
+
+            <!--view only appear when minimize-->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/titleWrapper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:text="Moyokoo"/>
+
+                    <TextView
+                        android:id="@+id/tvSubTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginTop="16dp"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:text="MoyokooMoyokoo"/>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/pauseWrapper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/imgvPause"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp" tools:src="@drawable/play"/>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/closeWrapper"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/imgvClose"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
+                        android:src="@drawable/close"/>
+                </FrameLayout>
+            </FrameLayout>
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/videoInfoRcv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </com.example.cpu11112_local.testdragvideo.DragVideoView>
+    </com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView>
 </FrameLayout>
