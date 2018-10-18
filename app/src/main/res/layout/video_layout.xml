@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.example.cpu11112_local.testdragvideo.test.MvImageView
+        android:id="@+id/videoView"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:background="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toStartOf="@+id/glVideo"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+    <android.support.constraint.Guideline android:id="@+id/glVideo" android:layout_width="wrap_content"
+                                          android:layout_height="wrap_content" android:orientation="vertical"
+                                          app:layout_constraintGuide_percent="0.42"/>
+    <android.support.constraint.Guideline android:id="@+id/glClose" android:layout_width="wrap_content"
+                                          android:layout_height="wrap_content" android:orientation="vertical"
+                                          app:layout_constraintGuide_percent="0.87"/>
+    <android.support.constraint.Guideline android:id="@+id/glPlay" android:layout_width="wrap_content"
+                                          android:layout_height="wrap_content" android:orientation="vertical"
+                                          app:layout_constraintGuide_percent="0.74"/>
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:text="Con đường hạnh phúc" app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@+id/tvSubtitle" app:layout_constraintEnd_toStartOf="@+id/glPlay"
+        app:layout_constraintHorizontal_bias="0.0" app:layout_constraintStart_toStartOf="@+id/glVideo"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Thùy Chi + M4U"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="@+id/tvTitle"
+        app:layout_constraintHorizontal_bias="0.0" app:layout_constraintStart_toStartOf="@+id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"/>
+    <ImageView
+        android:id="@+id/imgvPlay"
+        android:layout_width="25dp" android:layout_height="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/glPlay"
+        app:layout_constraintEnd_toEndOf="@+id/glClose"
+        android:src="@drawable/play"
+        tools:layout_editor_absoluteX="292dp"/>
+
+    <ImageView
+        android:id="@+id/imgvClose"
+        android:layout_width="25dp" android:layout_height="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/glClose"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/close"
+        tools:layout_editor_absoluteX="292dp"/>
+</android.support.constraint.ConstraintLayout>
