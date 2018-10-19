@@ -15,6 +15,7 @@
     <!--fixme replace with fragment-->
     <com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView
         android:id="@+id/dragVideo"
+        android:background="#ffffff"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -27,21 +28,25 @@
             <!--video player-->
             <com.example.cpu11112_local.testdragvideo.test.MvImageView
                 android:id="@+id/videoView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorAccent"/>
 
             <!--view only appear when minimize-->
             <FrameLayout
+                android:id="@+id/videoMiniController"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-                    android:id="@+id/titleWrapper"
+                    android:id="@+id/info"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
-                    android:gravity="center"
+                    android:layout_marginBottom="@dimen/spacing_small"
+                    android:layout_marginLeft="@dimen/spacing_small"
+                    android:layout_marginTop="@dimen/spacing_small"
+                    android:gravity="center_vertical"
                     android:orientation="vertical">
 
                     <TextView
@@ -49,55 +54,54 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:text="Moyokoo"/>
+                        android:maxLines="1"
+                        android:text="Duyên mình lỡ"
+                        android:textColor="#000000"
+                        android:textSize="@dimen/text"/>
 
                     <TextView
-                        android:id="@+id/tvSubTitle"
+                        android:id="@+id/tvArtist"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginTop="16dp"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:text="MoyokooMoyokoo"/>
+                        android:drawablePadding="@dimen/spacing_small"
+                        android:gravity="center_vertical"
+                        android:maxLines="1"
+                        android:textColor="#90000000"
+                        android:text="Hương Tràm"
+                        android:textSize="@dimen/text_small"/>
                 </LinearLayout>
 
-                <FrameLayout
-                    android:id="@+id/pauseWrapper"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                <ImageButton
+                    android:id="@+id/btnPlayPause"
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_media_play"
+                    android:scaleType="centerInside"/>
 
-                    <ImageView
-                        android:id="@+id/imgvPause"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp" tools:src="@drawable/play"/>
-                </FrameLayout>
+                <ImageButton
+                    android:id="@+id/btnNext"
+                    android:layout_width="45dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_media_next"/>
 
-                <FrameLayout
-                    android:id="@+id/closeWrapper"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/imgvClose"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginStart="16dp"
-                        android:src="@drawable/close"/>
-                </FrameLayout>
+                <ImageButton
+                    android:id="@+id/btnClose"
+                    android:layout_width="45dp"
+                    android:layout_height="@dimen/playbar_icon"
+                    android:layout_gravity="center_vertical"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/close"/>
             </FrameLayout>
         </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <ImageView
             android:id="@+id/videoInfoRcv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"/>
     </com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView>
 </FrameLayout>
