@@ -34,6 +34,7 @@
 
             <!--view only appear when minimize-->
             <FrameLayout
+                android:id="@+id/videoMiniController"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -54,6 +55,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:maxLines="1"
+                        android:text="Duyên mình lỡ"
                         android:textColor="#000000"
                         android:textSize="@dimen/text"/>
 
@@ -66,6 +68,7 @@
                         android:gravity="center_vertical"
                         android:maxLines="1"
                         android:textColor="#90000000"
+                        android:text="Hương Tràm"
                         android:textSize="@dimen/text_small"/>
                 </LinearLayout>
 
@@ -96,9 +99,9 @@
         </LinearLayout>
 
         <ImageView
-            android:background="@color/colorPrimary"
             android:id="@+id/videoInfoRcv"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"/>
     </com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView>
 </FrameLayout>

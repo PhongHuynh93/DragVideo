@@ -47,11 +47,15 @@ public class DragVideoYoutubeView extends ViewGroup {
     ImageButton mBtnClose;
     @BindView(R.id.videoInfoRcv)
     View mVideoInfoRcv;
+    @BindView(R.id.videoMiniController)
+    View mVideoMiniController;
 
     @BindDimen(R.dimen.spacing_normal)
     int mNormalSpace;
     @BindDimen(R.dimen.playbar_height)
     int mVideoHeight;
+    @BindDimen(R.dimen.playbar_icon)
+    int mPlaybarIcon;
     int mVideoHeightStartToMinimize;
 
     // The direction of the current drag
@@ -103,6 +107,12 @@ public class DragVideoYoutubeView extends ViewGroup {
     private Unbinder mUnbinder;
     private int mRangeScrollY;
     private int mMaxHeight;
+
+    // range to start revealing the menu button
+    private int mRange1;
+    private int mRange2;
+    private int mRange3;
+    private int mRange4;
 //    private int mDescMaxHeight;
 
     public DragVideoYoutubeView(Context context) {
@@ -120,7 +130,6 @@ public class DragVideoYoutubeView extends ViewGroup {
 
     private void init() {
         mDragHelper = ViewDragHelper.create(this, 1f, new MyHelperCallback());
-
     }
 
     @Override
@@ -149,7 +158,10 @@ public class DragVideoYoutubeView extends ViewGroup {
         if (!mIsFinishInit) {
             restorePosition();
             mIsFinishInit = true;
-
+            mRange1 = (int) (maxWidth - mNormalSpace * 2 - mPlaybarIcon * 3 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
+            mRange2 = (int) (maxWidth - mNormalSpace * 2 - mPlaybarIcon * 2 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
+            mRange3 = (int) (maxWidth - mNormalSpace * 2 - mPlaybarIcon - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
+            mRange4 = (int) (maxWidth - mNormalSpace * 2 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
             mRangeScrollY = (int) (mMaxHeight - getPaddingTop() - getPaddingBottom() - mVideoHeight);
         }
     }
@@ -281,6 +293,53 @@ public class DragVideoYoutubeView extends ViewGroup {
                     MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
             Log.e(TAG, String.format("justMeasurePlayer: đã vượt qua 0.9 %d", widthCurSize));
             mVideoPlayer.layout(0, 0, widthCurSize, heightCurSize);
+
+            mVideoMiniController.measure(MeasureSpec.makeMeasureSpec(newPlayerWidth - widthCurSize, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+
+            int widthOffset = (int) (widthCurSize - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
+            int infoWidth = Math.max(0, mRange1 - widthOffset);
+            int playPauseWidth = mPlaybarIcon;
+            int nextWidth = mPlaybarIcon;
+            int closeWidth = mPlaybarIcon;
+
+            int playPauseOffset = mRange1 - widthOffset;
+            int nextOffset = mRange2 - widthOffset;
+            int closeOffset = mRange3 - widthOffset;
+
+            if (widthOffset >= mRange1) {
+                infoWidth = 0;
+                playPauseWidth = Math.min(widthOffset - mRange1, mPlaybarIcon);
+                playPauseOffset = 0;
+            }
+
+            if (widthOffset >= mRange2) {
+                playPauseWidth = 0;
+                nextWidth = Math.min(widthOffset - mRange2, mPlaybarIcon);
+                nextOffset = 0;
+            }
+
+            if (widthOffset >= mRange3) {
+                nextWidth = 0;
+                closeWidth = Math.min(widthOffset - mRange3, mPlaybarIcon);
+                closeOffset = 0;
+            }
+
+
+            mInfo.measure(MeasureSpec.makeMeasureSpec(infoWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+            mBtnPlayPause.measure(MeasureSpec.makeMeasureSpec(playPauseWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+            mBtnNext.measure(MeasureSpec.makeMeasureSpec(nextWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+            mBtnClose.measure(MeasureSpec.makeMeasureSpec(closeWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+
+            mInfo.layout(0, 0, infoWidth, heightCurSize);
+            mBtnPlayPause.layout(playPauseOffset, 0, playPauseWidth, heightCurSize);
+            mBtnNext.layout(nextOffset, 0, nextWidth, heightCurSize);
+            mBtnClose.layout(closeOffset, 0, closeWidth, heightCurSize);
+
         } else {
             int heightCurSize = (int) (mPlayerMaxHeight - (mVerticalOffset) / (PERCENT_START_TO_SCALE)
                     * (mPlayerMaxHeight - mVideoHeightStartToMinimize));
@@ -288,6 +347,9 @@ public class DragVideoYoutubeView extends ViewGroup {
                     MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
             Log.e(TAG, String.format("justMeasurePlayer: %d", newPlayerWidth));
             mVideoPlayer.layout(0, 0, newPlayerWidth, heightCurSize);
+
+//            mVideoMiniController.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY),
+//                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         }
     }
 
