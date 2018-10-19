@@ -8,9 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView;
 import com.example.cpu11112_local.testdragvideo.R;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
+
+    @BindView(R.id.mainRcv)
+    RecyclerView mMainRcv;
     private DragVideoYoutubeView mDragVideoView;
 
     @Override
@@ -18,14 +22,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        RecyclerView recyclerView = findViewById(R.id.mainRcv);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        recyclerView.setAdapter(new TestDataAdapter(new TestDataAdapter.OnAdapterInteract() {
+        mMainRcv.setLayoutManager(new GridLayoutManager(this, 2));
+        TestDataAdapter adapter = new TestDataAdapter(new TestDataAdapter.OnAdapterInteract() {
             @Override
             public void onClickVideo(int adapterPosition) {
                 mDragVideoView.show();
             }
-        }));
+        });
+        mMainRcv.setAdapter(adapter);
 
         mDragVideoView = (DragVideoYoutubeView) findViewById(R.id.dragVideo);
         mDragVideoView.setCallback(new DragVideoYoutubeView.Callback() {
@@ -34,5 +38,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }
