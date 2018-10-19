@@ -1,4 +1,4 @@
-package com.example.cpu11112_local.testdragvideo;
+package com.example.cpu11112_local.testdragvideo.dragVideo;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

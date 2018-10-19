@@ -12,7 +12,7 @@
         android:layout_height="match_parent"/>
 
     <!--fixme replace with fragment-->
-    <com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView
+    <com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeViewNew
         android:id="@+id/dragVideo"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,5 +25,5 @@
             android:id="@+id/videoInfoRcv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-    </com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView>
+    </com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeViewNew>
 </FrameLayout>

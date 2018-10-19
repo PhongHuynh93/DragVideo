@@ -5,8 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView;
 import com.example.cpu11112_local.testdragvideo.R;
+import com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

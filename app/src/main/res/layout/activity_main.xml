@@ -13,7 +13,7 @@
         android:layout_height="match_parent"/>
 
     <!--fixme replace with fragment-->
-    <com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView
+    <com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView
         android:id="@+id/dragVideo"
         android:background="#ffffff"
         android:layout_width="match_parent"
@@ -103,5 +103,5 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorPrimary"/>
-    </com.example.cpu11112_local.testdragvideo.DragVideoYoutubeView>
+    </com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView>
 </FrameLayout>
