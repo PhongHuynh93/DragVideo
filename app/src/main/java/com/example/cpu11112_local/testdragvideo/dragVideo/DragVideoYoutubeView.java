@@ -75,7 +75,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     private static final float RIGHT_DRAG_DISAPPEAR_OFFSET = (4f + PLAYER_RATIO) / (4f + 4f * PLAYER_RATIO);
 
     // we will scale from 0(expand) -> 1(minizie): and at 0.9, width start to scale
-    float PERCENT_START_TO_SCALE = 0.9f;
+    float PERCENT_START_TO_SCALE = 0.93f;
     // from 0 -> PERCENT_START_TO_SCALE: height will start to scale from original height -> mVideoHeightStartToMinimize
 
     // Minimum zoom ratio
@@ -136,7 +136,6 @@ public class DragVideoYoutubeView extends ViewGroup {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mUnbinder = ButterKnife.bind(this);
-        mVideoHeightStartToMinimize = (int) (mVideoHeight * 1.1f);
     }
 
     @Override
@@ -164,7 +163,6 @@ public class DragVideoYoutubeView extends ViewGroup {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.e(TAG, "onMeasure: getMeasuredHeight() in onSizeChanged" + getMeasuredHeight());
 
         if (!mIsFinishInit) {
             mIsFinishInit = true;
@@ -173,8 +171,9 @@ public class DragVideoYoutubeView extends ViewGroup {
             mRange2 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon * 2 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
             mRange3 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
             mRange4 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
-            Log.e(TAG, "onMeasure: getMeasuredHeight() " + getMeasuredHeight());
             mRangeScrollY = (int) (getMeasuredHeight() - getPaddingTop() - getPaddingBottom() - mVideoHeight);
+            mVideoHeightStartToMinimize = (int) (getMeasuredHeight() - mRangeScrollY * PERCENT_START_TO_SCALE);
+            Log.e(TAG, "onSizeChanged: mVideoHeightStartToMinimize " + mVideoHeightStartToMinimize);
         }
     }
 
@@ -455,12 +454,101 @@ public class DragVideoYoutubeView extends ViewGroup {
         }
     }
 
-    private void requestLayoutLightly() {
-        justMeasureVideoWrapper();
-        justMeasurePlayer();
-        justMeasureDesc();
-//        onLayoutLightly();
-        ViewCompat.postInvalidateOnAnimation(this);
+    private void requestLayoutLightlyNew() {
+        // TODO: 10/20/2018 video wrapper
+        int rootWidth;
+        int heightVideoWrapper;
+        mLeft = (int) (mNormalSpace * mVerticalOffset);
+
+        if (mVerticalOffset >= PERCENT_START_TO_SCALE) {
+            // start to scale x
+            mLeft = mNormalSpace;
+            rootWidth = (int) (mPlayerMaxWidth - (mNormalSpace * 2));
+            heightVideoWrapper = (int) (mVideoHeightStartToMinimize - (mVerticalOffset - PERCENT_START_TO_SCALE) / (1 -
+                    PERCENT_START_TO_SCALE)
+                    * (mVideoHeightStartToMinimize - mVideoHeight));
+        } else {
+            mLeft = (int) ((mVerticalOffset) / (PERCENT_START_TO_SCALE) * (mNormalSpace));
+            rootWidth = (int) (mPlayerMaxWidth - (mVerticalOffset) / (PERCENT_START_TO_SCALE) * (mNormalSpace * 2));
+            heightVideoWrapper = (int) (mPlayerMaxHeight - (mVerticalOffset) / (PERCENT_START_TO_SCALE)
+                    * (mPlayerMaxHeight - mVideoHeightStartToMinimize));
+        }
+
+        mVideoWrapper.measure(MeasureSpec.makeMeasureSpec(rootWidth, MeasureSpec.EXACTLY),
+                              MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+        mVideoWrapper.layout(mLeft,
+                             mTop,
+                             mLeft + mVideoWrapper.getMeasuredWidth(),
+                             mTop + mVideoWrapper.getMeasuredHeight());
+
+        // TODO: 10/20/2018 video player
+        if (mVerticalOffset >= PERCENT_START_TO_SCALE) {
+            // start to scale x
+            int widthVideo = (int) (rootWidth - (mVerticalOffset - PERCENT_START_TO_SCALE) / (1 -
+                    PERCENT_START_TO_SCALE)
+                    * (rootWidth - mVideoHeight / VIDEO_THUMBNAIL_RATIO));
+            mVideoPlayer.measure(MeasureSpec.makeMeasureSpec(widthVideo, MeasureSpec.EXACTLY),
+                                 MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mVideoPlayer.layout(0, 0, widthVideo, heightVideoWrapper);
+
+            mVideoMiniController.measure(MeasureSpec.makeMeasureSpec(rootWidth - widthVideo,
+                                                                     MeasureSpec.EXACTLY),
+                                         MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mVideoMiniController.layout(widthVideo, 0, rootWidth, heightVideoWrapper);
+
+            int widthOffset = (int) (widthVideo - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
+            int infoWidth = Math.max(0, mRange1 - widthOffset);
+            int playPauseWidth = mPlaybarIcon;
+            int nextWidth = mPlaybarIcon;
+            int closeWidth = mPlaybarIcon;
+
+            int playPauseOffset = mRange1 - widthOffset;
+            int nextOffset = mRange2 - widthOffset;
+            int closeOffset = mRange3 - widthOffset;
+
+            if (widthOffset >= mRange1) {
+                infoWidth = 0;
+                playPauseOffset = 0;
+            }
+
+            if (widthOffset >= mRange2) {
+                playPauseWidth = 0;
+                nextOffset = 0;
+            }
+
+            if (widthOffset >= mRange3) {
+                nextWidth = 0;
+                closeOffset = 0;
+            }
+
+
+            mInfo.measure(MeasureSpec.makeMeasureSpec(infoWidth, MeasureSpec.EXACTLY),
+                          MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mBtnPlayPause.measure(MeasureSpec.makeMeasureSpec(playPauseWidth, MeasureSpec.EXACTLY),
+                                  MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mBtnNext.measure(MeasureSpec.makeMeasureSpec(nextWidth, MeasureSpec.EXACTLY),
+                             MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mBtnClose.measure(MeasureSpec.makeMeasureSpec(closeWidth, MeasureSpec.EXACTLY),
+                              MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mInfo.layout(0, 0, infoWidth, heightVideoWrapper);
+            mBtnPlayPause.layout(playPauseOffset, 0, playPauseOffset + playPauseWidth, heightVideoWrapper);
+            mBtnNext.layout(nextOffset, 0, nextOffset + nextWidth, heightVideoWrapper);
+            mBtnClose.layout(closeOffset, 0, closeOffset + closeWidth, heightVideoWrapper);
+        } else {
+            mVideoPlayer.measure(MeasureSpec.makeMeasureSpec(rootWidth, MeasureSpec.EXACTLY),
+                                 MeasureSpec.makeMeasureSpec(heightVideoWrapper, MeasureSpec.EXACTLY));
+            mVideoPlayer.layout(0, 0, rootWidth, heightVideoWrapper);
+            mVideoMiniController.layout(0, 0, 0, 0);
+        }
+
+        int heightCurSize = Math.max(0, getMeasuredHeight() - mTop - heightVideoWrapper);
+        mVideoInfoRcv.measure(MeasureSpec.makeMeasureSpec(rootWidth, MeasureSpec.EXACTLY),
+                              MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+        mVideoInfoRcv.layout(mLeft, mTop + mVideoWrapper.getMeasuredHeight(), mLeft + mVideoWrapper.getMeasuredWidth(),
+                             mTop + mVideoWrapper.getMeasuredHeight() + heightCurSize);
+
+//       // FIXME: 10/20/2018 not need to draw again
+//        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     private void slideToLeft() {
@@ -503,7 +591,7 @@ public class DragVideoYoutubeView extends ViewGroup {
 
                     mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
                     restorePosition();
-                    requestLayoutLightly();
+                    requestLayoutLightlyNew();
                 }
                 mDragDirect = NONE;
             }
@@ -562,7 +650,7 @@ public class DragVideoYoutubeView extends ViewGroup {
 //                mLeft = left;
 //                mHorizontalOffset = Math.abs((float) (mLeft + mPlayerMinWidth) / mHorizontalRange);
 //            }
-            requestLayoutLightly();
+            requestLayoutLightlyNew();
         }
 
         @Override
