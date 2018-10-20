@@ -19,11 +19,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/videoWrapper"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <!--video player-->
             <com.example.cpu11112_local.testdragvideo.test.MvImageView
@@ -55,6 +54,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:maxLines="1"
+                        android:ellipsize="end"
                         android:text="Duyên mình lỡ"
                         android:textColor="#000000"
                         android:textSize="@dimen/text"/>
@@ -67,6 +67,7 @@
                         android:drawablePadding="@dimen/spacing_small"
                         android:gravity="center_vertical"
                         android:maxLines="1"
+                        android:ellipsize="end"
                         android:textColor="#90000000"
                         android:text="Hương Tràm"
                         android:textSize="@dimen/text_small"/>
@@ -96,7 +97,7 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/close"/>
             </FrameLayout>
-        </LinearLayout>
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/videoInfoRcv"

@@ -302,6 +302,7 @@ public class DragVideoYoutubeView extends ViewGroup {
             mVideoMiniController.measure(MeasureSpec.makeMeasureSpec(newPlayerWidth - widthCurSize,
                                                                      MeasureSpec.EXACTLY),
                                          MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
+            mVideoMiniController.layout( widthCurSize, 0, newPlayerWidth, heightCurSize);
 
             int widthOffset = (int) (widthCurSize - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
             int infoWidth = Math.max(0, mRange1 - widthOffset);
@@ -354,9 +355,7 @@ public class DragVideoYoutubeView extends ViewGroup {
                                  MeasureSpec.makeMeasureSpec(heightCurSize, MeasureSpec.EXACTLY));
             Log.e(TAG, String.format("justMeasurePlayer: %d", newPlayerWidth));
             mVideoPlayer.layout(0, 0, newPlayerWidth, heightCurSize);
-
-//            mVideoMiniController.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY),
-//                    MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
+            mVideoMiniController.layout( 0, 0, 0, 0);
         }
     }
 
