@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.example.cpu11112_local.testdragvideo.R;
 
-public class Main2Activity extends AppCompatActivity {
+public class NothingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

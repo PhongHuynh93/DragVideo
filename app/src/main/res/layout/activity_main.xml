@@ -105,4 +105,5 @@
             android:layout_height="match_parent"
             android:background="@color/colorPrimary"/>
     </com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView>
+
 </FrameLayout>
