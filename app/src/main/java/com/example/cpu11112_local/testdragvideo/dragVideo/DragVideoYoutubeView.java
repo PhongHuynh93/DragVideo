@@ -60,13 +60,13 @@ public class DragVideoYoutubeView extends ViewGroup {
 
     // The direction of the current drag
     public static final int NONE = 1 << 0;
-    public static final int HORIZONTAL = 1 << 1;
-    public static final int VERTICAL = 1 << 2;
+    //    public static final int HORIZONTAL = 1 << 1;
+    public static final int VERTICAL_EXPAND_COLLAPSE = 1 << 2;
+    public static final int VERTICAL_DISMISS = 1 << 3;
 
     // The direction of the last slides
-    public static final int SLIDE_RESTORE_ORIGINAL = 1 << 0;
-    public static final int SLIDE_TO_LEFT = 1 << 1;
-    public static final int SLIDE_TO_RIGHT = 1 << 2;
+    private static final int SLIDE_RESTORE_ORIGINAL = 1 << 0;
+    private static final int SLIDE_TO_DISMISS = 1 << 1;
 
     // the smallest ratio when drag the player
     private static final float PLAYER_RATIO = 0.45f;
@@ -92,6 +92,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     private int mPlayerMaxHeight;
 
     private float mVerticalOffset = 1f;
+    private float mVerticalOffsetDismiss = 1f;
     //    private int mHorizontalRange;
 //    private int mVerticalRange;
     private int mLeft;
@@ -103,7 +104,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     private int mDownY;
     private WeakReference<Callback> mCallback;
     private int mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
-    private float mHorizontalOffset;
+    //    private float mHorizontalOffset;
     private Unbinder mUnbinder;
     private int mRangeScrollY;
 //    private int mMaxHeight;
@@ -113,6 +114,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     private int mRange2;
     private int mRange3;
     private int mRange4;
+    private int mRangeScrollToDismiss;
 //    private int mDescMaxHeight;
 
     public DragVideoYoutubeView(Context context) {
@@ -167,11 +169,15 @@ public class DragVideoYoutubeView extends ViewGroup {
         if (!mIsFinishInit) {
             mIsFinishInit = true;
             restorePosition();
-            mRange1 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon * 3 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
-            mRange2 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon * 2 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
-            mRange3 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
+            mRange1 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon * 3 - mVideoHeight /
+                    VIDEO_THUMBNAIL_RATIO);
+            mRange2 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon * 2 - mVideoHeight /
+                    VIDEO_THUMBNAIL_RATIO);
+            mRange3 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mPlaybarIcon - mVideoHeight /
+                    VIDEO_THUMBNAIL_RATIO);
             mRange4 = (int) (getMeasuredWidth() - mNormalSpace * 2 - mVideoHeight / VIDEO_THUMBNAIL_RATIO);
             mRangeScrollY = (int) (getMeasuredHeight() - getPaddingTop() - getPaddingBottom() - mVideoHeight);
+            mRangeScrollToDismiss = (int) (mVideoHeight);
             mVideoHeightStartToMinimize = (int) (getMeasuredHeight() - mRangeScrollY * PERCENT_START_TO_SCALE);
             Log.e(TAG, "onSizeChanged: mVideoHeightStartToMinimize " + mVideoHeightStartToMinimize);
         }
@@ -198,14 +204,15 @@ public class DragVideoYoutubeView extends ViewGroup {
                     mDownY = (int) event.getY();
                     break;
                 case MotionEvent.ACTION_UP:
-                    // scroll back to suitable position
+                    // scroll back to suitable position when we press the video
                     if (mDragDirect == NONE) {
                         int dx = Math.abs(mDownX - (int) event.getX());
                         int dy = Math.abs(mDownY - (int) event.getY());
                         int slop = mDragHelper.getTouchSlop();
 
+                        // detect a click, not a drag
                         if (Math.sqrt(dx * dx + dy * dy) < slop) {
-                            mDragDirect = VERTICAL;
+                            mDragDirect = VERTICAL_EXPAND_COLLAPSE;
 
                             if (mIsMinimum)
                                 maximize();
@@ -221,10 +228,16 @@ public class DragVideoYoutubeView extends ViewGroup {
                         int slop = mDragHelper.getTouchSlop();
 
                         if (Math.sqrt(dx * dx + dy * dy) >= slop) {
-                            if (dy >= dx)
-                                mDragDirect = VERTICAL;
-                            else
-                                mDragDirect = HORIZONTAL;
+                            if (dy >= dx) {
+                                if (mIsMinimum && mDownY < ((int) event.getY())) {
+                                    mDragDirect = VERTICAL_DISMISS;
+                                } else {
+                                    mDragDirect = VERTICAL_EXPAND_COLLAPSE;
+                                }
+                            } else {
+                                // dont intercept the horizontal touch
+                                return false;
+                            }
                         }
                     }
                     break;
@@ -248,7 +261,7 @@ public class DragVideoYoutubeView extends ViewGroup {
 
     public void show() {
         this.setAlpha(1f);
-        mDragDirect = VERTICAL;
+        mDragDirect = VERTICAL_EXPAND_COLLAPSE;
         maximize();
     }
 
@@ -256,14 +269,16 @@ public class DragVideoYoutubeView extends ViewGroup {
         void onDisappear(int direct);
     }
 
-    // hide this view, make the player small so when show the video, it will grow bigger
+    // hide this view at the bottom of the screen, make the player small so when show the video, it will grow bigger
     private void restorePosition() {
         mVideoWrapper.setAlpha(1f);
         this.setAlpha(0f);
-//        mLeft = mHorizontalRange - mPlayerMinWidth;
-        mTop = mRangeScrollY;
+        mLeft = mNormalSpace;
+        // TODO: 10/20/2018 add padding bottom to this top
+        mTop = mRangeScrollY + mRangeScrollToDismiss;
         mIsMinimum = true;
         mVerticalOffset = 1f;
+        mVerticalOffsetDismiss = 1;
     }
 
     private void customMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -454,8 +469,24 @@ public class DragVideoYoutubeView extends ViewGroup {
         }
     }
 
-    private void requestLayoutLightlyNew() {
-        // TODO: 10/20/2018 video wrapper
+    private void slideToOriginalPosition() {
+        slideVerticalDismissTo(0f);
+        mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
+    }
+
+    private void slideToDismiss() {
+        slideVerticalDismissTo(1f);
+        mDisappearDirect = SLIDE_TO_DISMISS;
+    }
+
+    private void slideVerticalDismissTo(float slideOffset) {
+        int y = (int) (mRangeScrollY + slideOffset * mRangeScrollToDismiss);
+        if (mDragHelper.smoothSlideViewTo(mVideoWrapper, mLeft, y)) {
+            ViewCompat.postInvalidateOnAnimation(this);
+        }
+    }
+
+    private void requestLayoutLightly() {
         int rootWidth;
         int heightVideoWrapper;
         mLeft = (int) (mNormalSpace * mVerticalOffset);
@@ -481,7 +512,6 @@ public class DragVideoYoutubeView extends ViewGroup {
                              mLeft + mVideoWrapper.getMeasuredWidth(),
                              mTop + mVideoWrapper.getMeasuredHeight());
 
-        // TODO: 10/20/2018 video player
         if (mVerticalOffset >= PERCENT_START_TO_SCALE) {
             // start to scale x
             int widthVideo = (int) (rootWidth - (mVerticalOffset - PERCENT_START_TO_SCALE) / (1 -
@@ -547,31 +577,7 @@ public class DragVideoYoutubeView extends ViewGroup {
         mVideoInfoRcv.layout(mLeft, mTop + mVideoWrapper.getMeasuredHeight(), mLeft + mVideoWrapper.getMeasuredWidth(),
                              mTop + mVideoWrapper.getMeasuredHeight() + heightCurSize);
 
-//       // FIXME: 10/20/2018 not need to draw again
-//        ViewCompat.postInvalidateOnAnimation(this);
-    }
-
-    private void slideToLeft() {
-        slideHorizontalTo(0f);
-        mDisappearDirect = SLIDE_TO_LEFT;
-    }
-
-    private void slideToRight() {
-        slideHorizontalTo(1f);
-        mDisappearDirect = SLIDE_TO_RIGHT;
-    }
-
-    private void slideToOriginalPosition() {
-        slideHorizontalTo(ORIGINAL_MIN_OFFSET);
-        mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
-    }
-
-    private void slideHorizontalTo(float slideOffset) {
-//        int leftBound = -mVideoPlayer.getWidth();
-//        int x = (int) (leftBound + slideOffset * mHorizontalRange);
-//        if (mDragHelper.smoothSlideViewTo(mVideoPlayer, x, mTop)) {
-//            ViewCompat.postInvalidateOnAnimation(this);
-//        }
+        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     private class MyHelperCallback extends ViewDragHelper.Callback {
@@ -585,14 +591,15 @@ public class DragVideoYoutubeView extends ViewGroup {
         public void onViewDragStateChanged(int state) {
             if (state == ViewDragHelper.STATE_IDLE) {
                 // time to remove the dragview
-                if (mIsMinimum && mDragDirect == HORIZONTAL && mDisappearDirect != SLIDE_RESTORE_ORIGINAL) {
+                if (mIsMinimum && mDragDirect == VERTICAL_DISMISS && mDisappearDirect != SLIDE_RESTORE_ORIGINAL) {
                     if (mCallback != null && mCallback.get() != null)
                         mCallback.get().onDisappear(mDisappearDirect);
 
                     mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
                     restorePosition();
-                    requestLayoutLightlyNew();
+                    requestLayoutLightly();
                 }
+                // return the NONE state if idle to detect a click
                 mDragDirect = NONE;
             }
         }
@@ -600,72 +607,55 @@ public class DragVideoYoutubeView extends ViewGroup {
         @Override
         public int getViewVerticalDragRange(@NonNull View child) {
             int range = 0;
-            if (child == mVideoWrapper && mDragDirect == VERTICAL) {
-                range = mRangeScrollY;
+            if (child == mVideoWrapper) {
+                if (mDragDirect == VERTICAL_EXPAND_COLLAPSE) {
+                    range = mRangeScrollY;
+                } else if (mDragDirect == VERTICAL_DISMISS) {
+                    range = mRangeScrollToDismiss;
+                }
             }
-            return range;
-        }
-
-        @Override
-        public int getViewHorizontalDragRange(@NonNull View child) {
-            int range = 0;
-
-//            if (child == mVideoPlayer && mIsMinimum && mDragDirect == HORIZONTAL) {
-//                range = mHorizontalRange;
-//            }
             return range;
         }
 
         @Override
         public int clampViewPositionVertical(@NonNull View child, int top, int dy) {
+            Log.e(TAG, String.format("clampViewPositionVertical: top %d dy %d", top, dy));
             int newTop = mTop;
-            if (child == mVideoWrapper && mDragDirect == VERTICAL) {
-                int bottomBound = (int) mRangeScrollY;
-                newTop = Math.min(Math.max(top, 0), bottomBound);
+            if (child == mVideoWrapper) {
+                if (mDragDirect == VERTICAL_EXPAND_COLLAPSE) {
+                    int bottomBound = (int) mRangeScrollY;
+                    newTop = Math.min(Math.max(top, 0), bottomBound);
+                } else if (mDragDirect == VERTICAL_DISMISS) {
+                    int bottomBound = (int) (mRangeScrollY + mRangeScrollToDismiss);
+                    newTop = Math.min(Math.max(top, 0), bottomBound);
+                }
             }
             return newTop;
-        }
-
-        @Override
-        public int clampViewPositionHorizontal(@NonNull View child, int left, int dx) {
-//            int newLeft = mLeft;
-//            if (child == mVideoPlayer && mIsMinimum && mDragDirect == HORIZONTAL) {
-//                int leftBound = -mVideoPlayer.getWidth();
-//                int rightBound = leftBound + mHorizontalRange;
-//                newLeft = Math.min(Math.max(left, leftBound), rightBound);
-//            }
-//            return newLeft;
-
-            return left;
         }
 
         // calling when drag
         @Override
         public void onViewPositionChanged(@NonNull View changedView, int left, int top, int dx, int dy) {
-            if (mDragDirect == VERTICAL) { //垂直方向
-                mTop = top;
+            mTop = top;
+            if (mDragDirect == VERTICAL_EXPAND_COLLAPSE) { //垂直方向
                 mVerticalOffset = (float) mTop / mRangeScrollY;
+            } else if (mIsMinimum && mDragDirect == VERTICAL_DISMISS) {
+                mVerticalOffsetDismiss = (float) (mTop - mRangeScrollY) / mRangeScrollToDismiss;
             }
-//            else if (mIsMinimum && mDragDirect == HORIZONTAL) {
-//                mLeft = left;
-//                mHorizontalOffset = Math.abs((float) (mLeft + mPlayerMinWidth) / mHorizontalRange);
-//            }
-            requestLayoutLightlyNew();
+            requestLayoutLightly();
         }
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
-            if (mDragDirect == VERTICAL) {
+            if (mDragDirect == VERTICAL_EXPAND_COLLAPSE) {
                 if (yvel > 0 || (yvel == 0 && mVerticalOffset >= 0.5f))
                     minimize();
                 else if (yvel < 0 || (yvel == 0 && mVerticalOffset < 0.5f))
                     maximize();
-            } else if (mIsMinimum && mDragDirect == HORIZONTAL) {
-                if ((mHorizontalOffset < LEFT_DRAG_DISAPPEAR_OFFSET && xvel < 0))
-                    slideToLeft();
-                else if ((mHorizontalOffset > RIGHT_DRAG_DISAPPEAR_OFFSET && xvel > 0))
-                    slideToRight();
-                else
+            } else if (mIsMinimum && mDragDirect == VERTICAL_DISMISS) {
+                if (yvel > 0 || (yvel == 0 && mVerticalOffsetDismiss >= 0.5f))
+                    slideToDismiss();
+                else if (yvel < 0 || (yvel == 0 && mVerticalOffsetDismiss < 0.5f))
                     slideToOriginalPosition();
             }
         }
