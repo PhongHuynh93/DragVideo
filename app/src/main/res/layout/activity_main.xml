@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,9 +15,9 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mainRcv"
-            android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="0dp"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <android.support.design.widget.BottomNavigationView
             android:id="@+id/bottom_navigation"
@@ -27,13 +27,12 @@
             app:itemBackground="@color/colorPrimary"
             app:itemIconTint="@android:color/white"
             app:itemTextColor="@android:color/white"
-            app:menu="@menu/bottom_navigation_main" />
+            app:menu="@menu/bottom_navigation_main"/>
     </LinearLayout>
 
     <!--fixme replace with fragment-->
     <com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView
         android:id="@+id/dragVideo"
-        android:background="#ffffff"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -47,22 +46,19 @@
                 android:id="@+id/videoView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/colorAccent"/>
+                android:background="@android:color/holo_orange_light"/>
 
             <!--view only appear when minimize-->
             <FrameLayout
                 android:id="@+id/videoMiniController"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@android:color/white">
 
                 <LinearLayout
                     android:id="@+id/info"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="@dimen/spacing_small"
-                    android:layout_marginLeft="@dimen/spacing_small"
-                    android:layout_marginTop="@dimen/spacing_small"
+                    android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="vertical">
 
@@ -71,8 +67,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:maxLines="1"
+                        android:layout_marginLeft="@dimen/spacing_normal"
+                        android:layout_marginRight="@dimen/spacing_normal"
                         android:ellipsize="end"
+                        android:maxLines="1"
                         android:text="Duyên mình lỡ"
                         android:textColor="#000000"
                         android:textSize="@dimen/text"/>
@@ -82,36 +80,35 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="@dimen/spacing_normal"
+                        android:layout_marginRight="@dimen/spacing_normal"
                         android:drawablePadding="@dimen/spacing_small"
+                        android:ellipsize="end"
                         android:gravity="center_vertical"
                         android:maxLines="1"
-                        android:ellipsize="end"
-                        android:textColor="#90000000"
                         android:text="Hương Tràm"
+                        android:textColor="#90000000"
                         android:textSize="@dimen/text_small"/>
                 </LinearLayout>
 
                 <ImageButton
                     android:id="@+id/btnPlayPause"
-                    android:layout_width="45dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_media_play"
-                    android:scaleType="centerInside"/>
+                    android:layout_width="@dimen/playbar_icon"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_media_play"/>
 
                 <ImageButton
                     android:id="@+id/btnNext"
-                    android:layout_width="45dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
+                    android:layout_width="@dimen/playbar_icon"
+                    android:layout_height="wrap_content"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_media_next"/>
 
                 <ImageButton
                     android:id="@+id/btnClose"
-                    android:layout_width="45dp"
-                    android:layout_height="@dimen/playbar_icon"
-                    android:layout_gravity="center_vertical"
+                    android:layout_width="@dimen/playbar_icon"
+                    android:layout_height="wrap_content"
                     android:scaleType="centerInside"
                     android:src="@drawable/close"/>
             </FrameLayout>
@@ -121,7 +118,7 @@
             android:id="@+id/videoInfoRcv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorPrimary"/>
+            android:background="@android:color/holo_green_light"/>
     </com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView>
 
 </FrameLayout>
