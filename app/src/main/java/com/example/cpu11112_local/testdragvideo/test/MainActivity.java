@@ -1,11 +1,15 @@
 package com.example.cpu11112_local.testdragvideo.test;
 
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Surface;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
@@ -23,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
     View mBottomNav;
     @BindView(R.id.dragVideo)
     DragVideoYoutubeView mDragVideo;
+    @BindView(R.id.videoView)
+    TextureView mVideoView;
     private Rect mMainContentRect = new Rect();
+    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +42,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClickVideo(int adapterPosition) {
                 mDragVideo.show();
+                if (mMediaPlayer.isPlaying())
+                    return;
+                try {
+                    mMediaPlayer.prepare();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                mMediaPlayer.start();
             }
         });
         mMainRcv.setAdapter(adapter);
@@ -51,12 +66,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mDragVideo.setCallback(mDragVideoCallback);
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.test_4);
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mMediaPlayer.setLooping(true);
+            }
+        });
+
+        mVideoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+            @Override
+            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                mMediaPlayer.setSurface(new Surface(surface));
+            }
+
+            @Override
+            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+            }
+
+            @Override
+            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                finish();
+                return true;
+            }
+
+            @Override
+            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+            }
+        });
     }
 
     DragVideoYoutubeView.Callback mDragVideoCallback = new DragVideoYoutubeView.Callback() {
         @Override
         public void onDisappear(int direct) {
-
+            mMediaPlayer.pause();
         }
 
         @Override
@@ -76,6 +122,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         mDragVideo.removeCallback(mDragVideoCallback);
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.stop();
+        }
+        mMediaPlayer.release();
         super.onDestroy();
     }
 
