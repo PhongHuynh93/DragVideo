@@ -36,6 +36,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <View
+            android:background="@android:color/black"
+            android:id="@+id/bgView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
         <FrameLayout
             android:id="@+id/videoWrapper"
             android:layout_width="match_parent"
