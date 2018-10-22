@@ -420,8 +420,6 @@ public class DragVideoYoutubeView extends ViewGroup {
                 bottomVideoInfoRcv);
 
         adjustBackgroundOpa();
-        // FIXME: 10/22/2018 do we need to invalidate here
-//        ViewCompat.postInvalidateOnAnimation(this);
 
         if (mDragDirect == VERTICAL_DISMISS) {
             // fade out the view when dismiss
