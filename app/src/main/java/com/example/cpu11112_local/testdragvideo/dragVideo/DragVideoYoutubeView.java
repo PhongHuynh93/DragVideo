@@ -2,6 +2,8 @@ package com.example.cpu11112_local.testdragvideo.dragVideo;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.os.Build;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -103,6 +105,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     private int mRangeScrollToDismiss;
     private int mMarginIcon;
     private int mMarginVideoInfo;
+    private Rect mMainContentRect = new Rect();
 
     public DragVideoYoutubeView(Context context) {
         this(context, null);
@@ -252,8 +255,6 @@ public class DragVideoYoutubeView extends ViewGroup {
 
     public void setCallback(Callback callback) {
         mCallbacks.add(callback);
-        // notify the observer the current state
-        callback.onOffsetChange(mVerticalOffset);
     }
 
     public void removeCallback(Callback callback) {
@@ -437,6 +438,10 @@ public class DragVideoYoutubeView extends ViewGroup {
     private void adjustBackgroundOpa() {
         float alpha = MAX_BACKGROUND_ALPHA * (1 - mVerticalOffset);
         mBgView.setAlpha(alpha);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            mMainContentRect.set(mBgView.getLeft(), mBgView.getTop(), mBgView.getRight(), mTop);
+            mBgView.setClipBounds(mMainContentRect);
+        }
     }
 
     private class MyHelperCallback extends ViewDragHelper.Callback {

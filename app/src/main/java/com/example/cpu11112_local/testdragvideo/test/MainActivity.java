@@ -1,5 +1,6 @@
 package com.example.cpu11112_local.testdragvideo.test;
 
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     View mBottomNav;
     @BindView(R.id.dragVideo)
     DragVideoYoutubeView mDragVideo;
+    private Rect mMainContentRect = new Rect();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 mDragVideo.setOffsetBottom(mBottomNav.getHeight());
             }
         });
+        mDragVideo.setCallback(mDragVideoCallback);
     }
 
     DragVideoYoutubeView.Callback mDragVideoCallback = new DragVideoYoutubeView.Callback() {
@@ -60,19 +63,20 @@ public class MainActivity extends AppCompatActivity {
         public void onOffsetChange(float verticalOffset) {
             int heightBottomNav = mBottomNav.getHeight();
             mBottomNav.setTranslationY(heightBottomNav - verticalOffset * heightBottomNav);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                // prevent overdrawing while this view is overlap
+                mMainContentRect.set(mMainRcv.getLeft(), mMainRcv.getTop(), mMainRcv.getRight(), (int)
+                        (mMainRcv.getBottom() * verticalOffset));
+                mMainRcv.setClipBounds(mMainContentRect);
+            }
         }
     };
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mDragVideo.setCallback(mDragVideoCallback);
-    }
-
-    @Override
-    protected void onStop() {
+    protected void onDestroy() {
         mDragVideo.removeCallback(mDragVideoCallback);
-        super.onStop();
+        super.onDestroy();
     }
 
     @Override
