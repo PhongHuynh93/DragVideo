@@ -17,7 +17,8 @@ import android.widget.TextView;
 
 import com.example.cpu11112_local.testdragvideo.R;
 
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindDimen;
 import butterknife.BindView;
@@ -90,7 +91,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     private ViewDragHelper mDragHelper;
     private int mDownX;
     private int mDownY;
-    private WeakReference<Callback> mCallback;
+    private List<Callback> mCallbacks = new ArrayList<>();
     private int mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
     private Unbinder mUnbinder;
     private int mRangeScrollY;
@@ -129,6 +130,7 @@ public class DragVideoYoutubeView extends ViewGroup {
     @Override
     protected void onDetachedFromWindow() {
         mUnbinder.unbind();
+        mCallbacks.clear();
         super.onDetachedFromWindow();
     }
 
@@ -249,7 +251,13 @@ public class DragVideoYoutubeView extends ViewGroup {
     }
 
     public void setCallback(Callback callback) {
-        mCallback = new WeakReference<>(callback);
+        mCallbacks.add(callback);
+        // notify the observer the current state
+        callback.onOffsetChange(mVerticalOffset);
+    }
+
+    public void removeCallback(Callback callback) {
+        mCallbacks.remove(callback);
     }
 
     public void show() {
@@ -448,8 +456,9 @@ public class DragVideoYoutubeView extends ViewGroup {
             if (state == ViewDragHelper.STATE_IDLE) {
                 // time to remove the dragview
                 if (mIsMinimum && mDragDirect == VERTICAL_DISMISS && mDisappearDirect != SLIDE_RESTORE_ORIGINAL) {
-                    if (mCallback != null && mCallback.get() != null)
-                        mCallback.get().onDisappear(mDisappearDirect);
+                    for (Callback callback : mCallbacks) {
+                        callback.onDisappear(mDisappearDirect);
+                    }
 
                     mDisappearDirect = SLIDE_RESTORE_ORIGINAL;
                     restorePosition();
@@ -494,8 +503,9 @@ public class DragVideoYoutubeView extends ViewGroup {
             mTop = top;
             if (mDragDirect == VERTICAL_EXPAND_COLLAPSE) { //垂直方向
                 mVerticalOffset = (float) mTop / mRangeScrollY;
-                if (mCallback != null && mCallback.get() != null)
-                    mCallback.get().onOffsetChange(mVerticalOffset);
+                for (Callback callback : mCallbacks) {
+                    callback.onOffsetChange(mVerticalOffset);
+                }
             } else if (mIsMinimum && mDragDirect == VERTICAL_DISMISS) {
                 mVerticalOffsetDismiss = (float) (mTop - mRangeScrollY) / mRangeScrollToDismiss;
             }

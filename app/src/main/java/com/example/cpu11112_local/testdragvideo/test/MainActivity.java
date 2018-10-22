@@ -37,19 +37,6 @@ public class MainActivity extends AppCompatActivity {
         });
         mMainRcv.setAdapter(adapter);
 
-        mDragVideo.setCallback(new DragVideoYoutubeView.Callback() {
-            @Override
-            public void onDisappear(int direct) {
-
-            }
-
-            @Override
-            public void onOffsetChange(float verticalOffset) {
-                int heightBottomNav = mBottomNav.getHeight();
-                mBottomNav.setTranslationY(heightBottomNav - verticalOffset * heightBottomNav);
-            }
-        });
-
         mBottomNav.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -61,6 +48,31 @@ public class MainActivity extends AppCompatActivity {
                 mDragVideo.setOffsetBottom(mBottomNav.getHeight());
             }
         });
+    }
+
+    DragVideoYoutubeView.Callback mDragVideoCallback = new DragVideoYoutubeView.Callback() {
+        @Override
+        public void onDisappear(int direct) {
+
+        }
+
+        @Override
+        public void onOffsetChange(float verticalOffset) {
+            int heightBottomNav = mBottomNav.getHeight();
+            mBottomNav.setTranslationY(heightBottomNav - verticalOffset * heightBottomNav);
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mDragVideo.setCallback(mDragVideoCallback);
+    }
+
+    @Override
+    protected void onStop() {
+        mDragVideo.removeCallback(mDragVideoCallback);
+        super.onStop();
     }
 
     @Override
