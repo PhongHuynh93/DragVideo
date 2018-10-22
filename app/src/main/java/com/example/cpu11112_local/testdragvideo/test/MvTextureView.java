@@ -2,9 +2,10 @@ package com.example.cpu11112_local.testdragvideo.test;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.TextureView;
 
-public class MvTextureView extends TextureView {
+import org.salient.artplayer.VideoView;
+
+public class MvTextureView extends VideoView {
     public static final float VIDEO_THUMBNAIL_RATIO = 9f / 16;
 
     public MvTextureView(Context context) {

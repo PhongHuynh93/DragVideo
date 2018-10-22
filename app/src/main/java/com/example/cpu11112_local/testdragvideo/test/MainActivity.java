@@ -1,20 +1,21 @@
 package com.example.cpu11112_local.testdragvideo.test;
 
 import android.graphics.Rect;
-import android.graphics.SurfaceTexture;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Surface;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
 import com.example.cpu11112_local.testdragvideo.R;
 import com.example.cpu11112_local.testdragvideo.dragVideo.DragVideoYoutubeView;
+
+import org.salient.artplayer.MediaPlayerManager;
+import org.salient.artplayer.ScaleType;
+import org.salient.artplayer.VideoView;
+import org.salient.artplayer.ui.ControlPanel;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,9 +29,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.dragVideo)
     DragVideoYoutubeView mDragVideo;
     @BindView(R.id.videoView)
-    TextureView mVideoView;
+    VideoView mVideoView;
     private Rect mMainContentRect = new Rect();
-    private MediaPlayer mMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,14 +42,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClickVideo(int adapterPosition) {
                 mDragVideo.show();
-                if (mMediaPlayer.isPlaying())
-                    return;
-                try {
-                    mMediaPlayer.prepare();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                mMediaPlayer.start();
+                String url = "https://vnso-zn-11-tf-mcloud-bf-s7-mv-zmp3.zadn.vn/bKrForK3IzM/5e0baf84c1c0289e71d1/f5d9ff48d70d3e53671c/480/Thang-Dien.mp4?authen=exp=1540392821~acl=/bKrForK3IzM/*~hmac=631abeaf60db61b4bdc0f1032a6e6651";
+//                mVideoView.setUp("https://github.com/moyokoo/Media/blob/master/Azshara.mp4?raw=true");
+                mVideoView.setUp(url);
+                mVideoView.start();
+                MediaPlayerManager.instance().setScreenScale(ScaleType.SCALE_CENTER_CROP);
             }
         });
         mMainRcv.setAdapter(adapter);
@@ -66,43 +63,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mDragVideo.setCallback(mDragVideoCallback);
-
-        mMediaPlayer = MediaPlayer.create(this, R.raw.test_4);
-        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mMediaPlayer.setLooping(true);
-            }
-        });
-
-        mVideoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-            @Override
-            public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                mMediaPlayer.setSurface(new Surface(surface));
-            }
-
-            @Override
-            public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-            }
-
-            @Override
-            public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                finish();
-                return true;
-            }
-
-            @Override
-            public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-            }
-        });
+        mVideoView.setControlPanel(new ControlPanel(this));
     }
 
     DragVideoYoutubeView.Callback mDragVideoCallback = new DragVideoYoutubeView.Callback() {
         @Override
         public void onDisappear(int direct) {
-            mMediaPlayer.pause();
+            MediaPlayerManager.instance().releasePlayerAndView(MainActivity.this);
         }
 
         @Override
@@ -120,17 +87,23 @@ public class MainActivity extends AppCompatActivity {
     };
 
     @Override
-    protected void onDestroy() {
-        mDragVideo.removeCallback(mDragVideoCallback);
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.stop();
+    public void onBackPressed() {
+        if (MediaPlayerManager.instance().backPress()) {
+            return;
         }
-        mMediaPlayer.release();
-        super.onDestroy();
+        super.onBackPressed();
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    protected void onPause() {
+        super.onPause();
+        MediaPlayerManager.instance().pause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mDragVideo.removeCallback(mDragVideoCallback);
+        MediaPlayerManager.instance().releasePlayerAndView(this);
+        super.onDestroy();
     }
 }
