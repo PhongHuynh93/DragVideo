@@ -12,6 +12,8 @@ import android.view.ViewGroup;
  * Created by Phong Huynh on 10/22/2018.
  */
 public class BottomNavigationBehavior extends CoordinatorLayout.Behavior<View> {
+    private boolean mIsFinishOffset;
+
     public BottomNavigationBehavior() {
     }
 
@@ -21,17 +23,26 @@ public class BottomNavigationBehavior extends CoordinatorLayout.Behavior<View> {
 
     @Override
     public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency) {
-        return dependency instanceof BottomNavigationView;
+        // if already set the offset, return false to prevent calling onDependentViewChanged()
+        if (mIsFinishOffset) {
+            return false;
+        } else {
+            return dependency instanceof BottomNavigationView;
+        }
     }
 
     @Override
     public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, @NonNull View child, @NonNull View dependency) {
-//        child.offsetTopAndBottom();
-        setMargins(child, 0, 0, 0,child.getBottom() - dependency.getTop() );
-        return true;
+        if (!mIsFinishOffset) {
+            // only do it one time, because changing margin calls requestlayout()
+            mIsFinishOffset = true;
+            setMargins(child, 0, 0, 0, child.getBottom() - dependency.getTop());
+            return true;
+        }
+        return false;
     }
 
-    public static void setMargins (View v, int l, int t, int r, int b) {
+    public static void setMargins(View v, int l, int t, int r, int b) {
         if (v.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
             ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
             p.setMargins(l, t, r, b);

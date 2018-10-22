@@ -421,6 +421,11 @@ public class DragVideoYoutubeView extends ViewGroup {
         adjustBackgroundOpa();
         // FIXME: 10/22/2018 do we need to invalidate here
 //        ViewCompat.postInvalidateOnAnimation(this);
+
+        if (mDragDirect == VERTICAL_DISMISS) {
+            // fade out the view when dismiss
+            setAlpha(1 - mVerticalOffsetDismiss);
+        }
     }
 
     private void adjustVideoInfoAlpha(View... views) {
@@ -430,18 +435,8 @@ public class DragVideoYoutubeView extends ViewGroup {
     }
 
     private void adjustBackgroundOpa() {
-        // FIXME: 10/22/2018 this method make onmeasure run multiple time
         float alpha = MAX_BACKGROUND_ALPHA * (1 - mVerticalOffset);
         mBgView.setAlpha(alpha);
-        if (alpha == 0 || alpha == MAX_BACKGROUND_ALPHA) {
-            if (mBgView.getVisibility() != GONE) {
-                mBgView.setVisibility(GONE);
-            }
-        } else {
-            if (mBgView.getVisibility() != VISIBLE) {
-                mBgView.setVisibility(VISIBLE);
-            }
-        }
     }
 
     private class MyHelperCallback extends ViewDragHelper.Callback {
