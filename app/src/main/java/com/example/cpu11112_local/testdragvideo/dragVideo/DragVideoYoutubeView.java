@@ -167,7 +167,8 @@ public class DragVideoYoutubeView extends ViewGroup {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // only allow drag the player
-        boolean isHit = mDragHelper.isViewUnder(mVideoWrapper, (int) event.getX(), (int) event.getY());
+        boolean isHit = mDragHelper.isViewUnder(mVideoWrapper, (int) event.getX(), (int) event.getY()) ||
+                mDragHelper.isViewUnder(mVideoInfoRcv, (int) event.getX(), (int) event.getY());
         if (isHit) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
