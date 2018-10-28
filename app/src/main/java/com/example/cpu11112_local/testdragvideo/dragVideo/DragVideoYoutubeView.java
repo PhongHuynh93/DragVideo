@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cpu11112_local.testdragvideo.R;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static com.example.cpu11112_local.testdragvideo.test.MvImageView.VIDEO_THUMBNAIL_RATIO;
@@ -130,6 +132,21 @@ public class DragVideoYoutubeView extends ViewGroup {
         mUnbinder = ButterKnife.bind(this);
     }
 
+    @OnClick({R.id.btnPlayPause, R.id.btnNext, R.id.btnClose})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btnPlayPause:
+                Toast.makeText(getContext(), "you click play pause", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btnNext:
+                Toast.makeText(getContext(), "you click next", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btnClose:
+                Toast.makeText(getContext(), "you click close", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         mUnbinder.unbind();
@@ -186,8 +203,37 @@ public class DragVideoYoutubeView extends ViewGroup {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return mDragHelper.shouldInterceptTouchEvent(ev);
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (mDragHelper.shouldInterceptTouchEvent(event)) {
+            return true;
+        }
+
+        // if shouldInterceptTouchEvent mean there are some childs not allow this viewgroup use the touch event,
+        // so we have to check if we can detect move action, dont allow child the get the touch
+        boolean isHit = mDragHelper.isViewUnder(mVideoWrapper, (int) event.getX(), (int) event.getY());
+        if (isHit) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownX = (int) event.getX();
+                    mDownY = (int) event.getY();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    int dx = Math.abs(mDownX - (int) event.getX());
+                    int dy = Math.abs(mDownY - (int) event.getY());
+                    int slop = mDragHelper.getTouchSlop();
+
+                    Log.e(TAG,
+                          String.format("onInterceptTouchEvent: onMove %f slop %d",
+                                        Math.sqrt(dx * dx + dy * dy),
+                                        slop));
+                    // if move, intercept the touch
+                    if (Math.sqrt(dx * dx + dy * dy) >= slop) {
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return false;
     }
 
     @Override
